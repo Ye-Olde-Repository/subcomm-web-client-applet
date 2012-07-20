@@ -3,7 +3,6 @@ package com.roylaurie.subcomm.ui.web.client.applet;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.roylaurie.subcomm.client.SubcommClient;
@@ -33,9 +32,7 @@ public final class ConnectThread extends Thread {
                     public String run() {
                         try {
                             mClient.connect();
-                            if (mClient.connected()) {
-                                LOG.info("Connected to `" + mUri + "`.");
-                            } else {
+                            if (!mClient.connected()) {
                                 mApplet.notifyConnectionFailed(
                                     mUri,
                                     mClient,
@@ -59,8 +56,6 @@ public final class ConnectThread extends Thread {
             if (mClient != null) {
                 mClient.disconnect();
             }
-
-            LOG.log(Level.SEVERE, "Failed to connect to `" + mUri + "`.", e);
         }
     }
 }

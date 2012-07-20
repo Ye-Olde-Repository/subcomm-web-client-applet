@@ -5,7 +5,7 @@
   <artifactId>subcomm-web-client-applet</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>subcomm-web</name>
+  <name>subcomm-web-client-applet</name>
   <description>An HTML5 UI applet that connects to SubComm game servers using the subcomm library.</description>
   <url>https://github.com/roylaurie/subcomm-web-client-applet</url>
   <licenses>

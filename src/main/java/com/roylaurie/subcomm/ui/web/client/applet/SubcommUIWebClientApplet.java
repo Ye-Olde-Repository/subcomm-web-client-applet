@@ -1,15 +1,20 @@
 package com.roylaurie.subcomm.ui.web.client.applet;
 
 import java.applet.Applet;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import com.roylaurie.subcomm.client.SubcommClient;
 import com.roylaurie.subcomm.client.netchat.SubcommNetchatClient;
 
 public final class SubcommUIWebClientApplet extends Applet {
     private static final Logger LOG = Logger.getLogger(SubcommUIWebClientApplet.class.getCanonicalName());
+    private static final Pattern SANITIZE_PATTERN = Pattern.compile("[^\\u0000-\\uFFFF]"); // strip /u007f control char
+    private static final String EMPTY_STR = "";
     private static final long serialVersionUID = 1L;
     
     /* @var Map<String, SubcommClient> mClientMap Maps uri => client object. */
@@ -17,8 +22,30 @@ public final class SubcommUIWebClientApplet extends Applet {
     /* @var Map<String, SubcommClient> mExceptionMap Maps uri => exception object. */
     private final Map<String, Exception> mExceptionMap = new HashMap<String, Exception>();
     
+    /**
+     * Strips out unicode control characters.
+     * @param String input Valid string
+     * @return String
+     */
+    private static String sanitize(String input) {
+        return SANITIZE_PATTERN.matcher(input.trim()).replaceAll(EMPTY_STR);
+    }
+    
     public String connect(String id, String hostname, int port, String username, String password) {
-        final String uri = username + '@' + hostname + ':' + port + '#' + id;
+        if (id == null || hostname == null || port == 0 || username == null || password == null)
+            throw new IllegalArgumentException("All parameters are required.");
+        
+        id = sanitize(id);
+        hostname = sanitize(hostname);
+        username = sanitize(username);
+        password = sanitize(password);
+        
+        final String uri = new StringBuffer(username)
+        .append('@').append(hostname)
+        .append(':').append(port)
+        .append('#').append(id)
+        .toString();
+        
         synchronized(mClientMap) {
             if (mClientMap.containsKey(id))
                 return uri;
@@ -38,6 +65,7 @@ public final class SubcommUIWebClientApplet extends Applet {
      * @return SubcommClient NULL if no client found
      */
     public SubcommClient getClient(String uri) {
+        uri = sanitize(uri);
         synchronized(mClientMap) {
             return ( mClientMap.get(uri) );
         }
@@ -49,6 +77,7 @@ public final class SubcommUIWebClientApplet extends Applet {
      * @return Exception NULL if no exceptions thrown
      */
     public Exception nextClientException(String uri) {
+        uri = sanitize(uri);
         synchronized(mExceptionMap) {
             return mExceptionMap.remove(uri);
         }
@@ -66,12 +95,16 @@ public final class SubcommUIWebClientApplet extends Applet {
             
             mClientMap.put(uri, client);
         }
+        
+        LOG.info("Connected to `" + uri + "`.");
     }
     
     /* package */ void notifyConnectionFailed(String uri, SubcommClient client, Exception e) {
         synchronized(mExceptionMap) {
             mExceptionMap.put(uri, e);
         }
+        
+        LOG.log(Level.SEVERE, "Failed to connect to `" + uri + "`.", e);
     }
     
     /**
@@ -79,6 +112,7 @@ public final class SubcommUIWebClientApplet extends Applet {
      * @param String uri
      */
     public void disconnect(String uri) {
+        uri = sanitize(uri);
         final SubcommClient client;
         synchronized(mClientMap) {            
             synchronized(mExceptionMap) {
