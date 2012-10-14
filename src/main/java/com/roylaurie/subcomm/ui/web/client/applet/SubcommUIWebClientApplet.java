@@ -133,6 +133,10 @@ public final class SubcommUIWebClientApplet extends Applet {
         super.stop();
         synchronized(mClientMap) {
             for (SubcommClient client : mClientMap.values()) {
+                if (client == null) {
+                    continue;
+                }
+                
                 final String uri = client.getUsername() + '@' + client.getUsername() + ':' + client.getUsername();
                 client.disconnect();
                 LOG.info("Disconnected client `" + uri + "`.");
