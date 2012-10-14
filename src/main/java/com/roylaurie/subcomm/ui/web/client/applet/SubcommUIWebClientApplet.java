@@ -1,7 +1,6 @@
 package com.roylaurie.subcomm.ui.web.client.applet;
 
 import java.applet.Applet;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,10 +11,10 @@ import com.roylaurie.subcomm.client.SubcommClient;
 import com.roylaurie.subcomm.client.netchat.SubcommNetchatClient;
 
 public final class SubcommUIWebClientApplet extends Applet {
+    private static final long serialVersionUID = 1L;
     private static final Logger LOG = Logger.getLogger(SubcommUIWebClientApplet.class.getCanonicalName());
     private static final Pattern SANITIZE_PATTERN = Pattern.compile("[^\\u0000-\\uFFFF]"); // strip /u007f control char
     private static final String EMPTY_STR = "";
-    private static final long serialVersionUID = 1L;
     
     /* @var Map<String, SubcommClient> mClientMap Maps uri => client object. */
     private final Map<String, SubcommClient> mClientMap = new HashMap<String, SubcommClient>();

@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>subcomm-web-client-applet</name>
-  <description>An HTML5 UI applet that connects to SubComm game servers using the subcomm library.</description>
+  <description>Provides the Subcomm Web UI with a service Applet for creating and managing Subcomm chat connections.</description>
   <url>https://github.com/roylaurie/subcomm-web-client-applet</url>
   <licenses>
     <license>
@@ -43,6 +43,12 @@
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <keystore.type>JKS</keystore.type>
+    <keystore.path>src/main/keystore/subcomm-web-client-applet-dev.keystore</keystore.path>
+    <keystore.alias>dev</keystore.alias>
+    <keystore.password>subcommdev</keystore.password>
+    <keystore.store.password>subcommdev</keystore.store.password>
+    <keystore.key.password>subcommdev</keystore.key.password>
   </properties>
   <build>
     <plugins>
@@ -56,44 +62,46 @@
         </configuration>
       </plugin>
       <plugin>
-      <artifactId>maven-assembly-plugin</artifactId>
-      <version>2.3</version>
-      <configuration>
-        <descriptorRefs>
-          <descriptorRef>jar-with-dependencies</descriptorRef>
-        </descriptorRefs>
-        <archive>
-          <index>true</index>
-          <manifest>
-            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-          </manifest>
-        </archive>
-        <appendAssemblyId>false</appendAssemblyId>
-      </configuration>
-      <executions>
-        <execution>
-          <id>make-assembly</id>
-          <phase>package</phase>
-          <goals>
-            <goal>single</goal>
-          </goals>
-        </execution>
-      </executions>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <index>true</index>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jarsigner-plugin</artifactId>
+        <version>1.2</version>
         <executions>
           <execution>
+            <id>sign</id>
             <goals>
               <goal>sign</goal>
             </goals>
-            <phase>package</phase>
             <configuration>
-              <keystore>src/main/keystore/subcomm-web-client-applet-dev.keystore</keystore>
-              <alias>subcomm-web-client-applet-dev</alias>
-              <storepass>subcomm-web-client-applet-dev</storepass>
-              <keypass>subcomm-web-client-applet-dev</keypass>
+              <storetype>${keystore.type}</storetype>
+              <keystore>${keystore.path}</keystore>
+              <alias>${keystore.alias}</alias>
+              <storepass>${keystore.store.password}</storepass>
+              <keypass>${keystore.key.password}</keypass>
             </configuration>
           </execution>
         </executions>
